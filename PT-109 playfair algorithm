@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define SIZE 5
+void constructPlayfairSquare(char key[], char square[SIZE][SIZE]) {
+    int used[26] = {0};
+    int row = 0, col = 0;
+    for (int i = 0; i < strlen(key); i++) {
+        char ch = toupper(key[i]);
+        if (ch == 'J') ch = 'I'; 
+        if (!used[ch - 'A'] && isalpha(ch)) {
+            square[row][col++] = ch;
+            used[ch - 'A'] = 1;
+            if (col == SIZE) { col = 0; row++; }
+        }
+    }
+    for (char ch = 'A'; ch <= 'Z'; ch++) {
+        if (ch == 'J') continue;
+        if (!used[ch - 'A']) {
+            square[row][col++] = ch;
+            if (col == SIZE) { col = 0; row++; }
+        }
+    }
+}
+void findPosition(char letter, char square[SIZE][SIZE], int *row, int *col) {
+    if (letter == 'J') letter = 'I';
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            if (square[i][j] == letter) { *row = i; *col = j; return; }
+}
+void decryptPair(char a, char b, char square[SIZE][SIZE]) {
+    int row1, col1, row2, col2;
+    findPosition(a, square, &row1, &col1);
+    findPosition(b, square, &row2, &col2);
+    if (row1 == row2)
+        printf("%c%c", square[row1][(col1 + SIZE - 1) % SIZE], square[row2][(col2 + SIZE - 1) % SIZE]);
+    else if (col1 == col2)
+        printf("%c%c", square[(row1 + SIZE - 1) % SIZE][col1], square[(row2 + SIZE - 1) % SIZE][col2]);
+    else
+        printf("%c%c", square[row1][col2], square[row2][col1]);
+}
+int main() {
+    char key[] = "PT109JFK";
+    char ciphertext[] = "KXJEYUREBEZWEHEWRYTUHEYFS";
+    char square[SIZE][SIZE];
+    constructPlayfairSquare(key, square);
+    printf("Decrypted Text: ");
+    for (int i = 0; i < strlen(ciphertext); i += 2)
+        decryptPair(toupper(ciphertext[i]), toupper(ciphertext[i + 1]), square);
+    printf("\n");
+    return 0;
+}
