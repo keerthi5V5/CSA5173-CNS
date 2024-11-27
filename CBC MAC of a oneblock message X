@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <string.h>
+void block_encrypt(char *block, char *key, char *output, int block_size) {
+    for (int i = 0; i < block_size; i++) {
+        output[i] = block[i] ^ key[i];
+    }
+}
+void cbc_mac(char *message, int message_len, char *key, char *iv, int block_size) {
+    char previous_block[block_size];
+    char current_block[block_size];
+    char output[block_size];
+    memcpy(previous_block, iv, block_size);
+    for (int i = 0; i < message_len; i += block_size) {
+        for (int j = 0; j < block_size; j++) {
+            current_block[j] = message[i + j] ^ previous_block[j];
+        }
+        block_encrypt(current_block, key, output, block_size);
+        memcpy(previous_block, output, block_size);
+    }
+    printf("CBC-MAC: ");
+    for (int i = 0; i < block_size; i++) {
+        printf("%02x", (unsigned char)output[i]);
+    }
+    printf("\n");
+}
+int main() {
+    char key[8] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6};
+    char iv[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    char message[16] = "HELLOWORLD12345"; // Example message (16 bytes)
+    int block_size = 8;
+
+    printf("Original Message: %s\n", message);
+
+    cbc_mac(message, strlen(message), key, iv, block_size);
+
+    return 0;
+}
