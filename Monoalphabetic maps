@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+void monoalphabeticCipher(char text[], char key[]) {
+    char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
+    for (int i = 0; text[i] != '\0'; ++i) {
+        if (isalpha(text[i])) {
+            char ch = tolower(text[i]);
+            char offset = islower(text[i]) ? 'a' : 'A';
+            for (int j = 0; j < 26; ++j) {
+                if (ch == alphabet[j]) {
+                    text[i] = islower(text[i]) ? key[j] : toupper(key[j]);
+                    break;
+                }
+            }
+        }
+    }
+}
+int main() {
+    char text[100], key[27];
+    printf("Enter the string: ");
+    gets(text);
+    printf("Enter the substitution key (26 unique letters): ");
+    gets(key);
+    if (strlen(key) != 26) {
+        printf("Invalid key. Must have exactly 26 characters.\n");
+        return 1;
+    }
+    monoalphabeticCipher(text, key);
+    printf("Encrypted text: %s\n", text);
+    return 0;
+}
