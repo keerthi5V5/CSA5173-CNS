@@ -1,0 +1,12 @@
+#include <stdio.h>
+#include <math.h>
+int main() {
+    int n = 25;
+    double log_factorial = 0.0;
+    for (int i = 1; i <= n; i++) {
+        log_factorial += log10(i); 
+    }
+    log_factorial *= log2(10); 
+    printf("Approximate power of 2 for 25! is: 2^%.1f\n", log_factorial);
+    return 0;
+}
