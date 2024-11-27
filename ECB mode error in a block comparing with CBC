@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <string.h>
+void ecb_encrypt(const unsigned char *plaintext, size_t length, const unsigned char *key, unsigned char *ciphertext) {
+    for (size_t i = 0; i < length; i += 8) {
+        for (size_t j = 0; j < 8; j++) {
+            ciphertext[i + j] = plaintext[i + j] ^ key[j]; 
+        }
+    }
+}
+void ecb_decrypt(const unsigned char *ciphertext, size_t length, const unsigned char *key, unsigned char *plaintext) {
+    for (size_t i = 0; i < length; i += 8) {
+        for (size_t j = 0; j < 8; j++) {
+            plaintext[i + j] = ciphertext[i + j] ^ key[j]; 
+        }
+    }
+}
+void print_hex(const unsigned char *data, size_t length) {
+    for (size_t i = 0; i < length; i++) {
+        printf("%02x", data[i]);
+    }
+    printf("\n");
+}
+int main() {
+    unsigned char key[8] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6 };  
+    unsigned char plaintext[] = "This is a test";  
+    size_t length = strlen((char *)plaintext);
+    unsigned char ciphertext[128];
+    unsigned char decrypted[128];
+    ecb_encrypt(plaintext, length, key, ciphertext);
+    printf("Encrypted Ciphertext (in hex): ");
+    print_hex(ciphertext, length);
+    ciphertext[0] ^= 0x01;  
+    printf("\nCiphertext with error (in hex): ");
+    print_hex(ciphertext, length);
+    ecb_decrypt(ciphertext, length, key, decrypted);
+    printf("\nDecrypted Plaintext with error (in hex): ");
+    print_hex(decrypted, length);
+    return 0;
+}
