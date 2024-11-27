@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#define DES_BLOCK_SIZE 8
+#define DES_KEY_SIZE 8
+static const uint64_t S[8][64] = { };
+void des_encrypt(uint64_t *block, uint64_t key) {
+    *block ^= key;
+}
+void encrypt3DES_CBC(uint8_t *plaintext, size_t length, uint64_t *key, uint8_t *iv, uint8_t *ciphertext) {
+    uint64_t block;
+    uint8_t temp_iv[DES_BLOCK_SIZE];
+    memcpy(temp_iv, iv, DES_BLOCK_SIZE);  
+    for (size_t i = 0; i < length; i += DES_BLOCK_SIZE) {
+        memcpy(&block, plaintext + i, DES_BLOCK_SIZE);
+        for (int j = 0; j < DES_BLOCK_SIZE; j++) {
+            ((uint8_t *)&block)[j] ^= temp_iv[j];
+        }
+        des_encrypt(&block, key[0]); 
+        des_encrypt(&block, key[1]); 
+        des_encrypt(&block, key[2]);  
+        memcpy(ciphertext + i, &block, DES_BLOCK_SIZE);
+        memcpy(temp_iv, ciphertext + i, DES_BLOCK_SIZE);
+    }
+}
+void print_hex(uint8_t *data, size_t length) {
+    for (size_t i = 0; i < length; i++) {
+        printf("%02x", data[i]);
+    }
+    printf("\n");
+}
+int main() {
+    uint8_t plaintext[] = "This is a test message for 3DES CBC mode encryption!";
+    size_t length = strlen((char *)plaintext);
+    uint64_t key[3] = { 0x133457799BBCDFF1, 0x1A2B3C4D5E6F7081, 0x9A8B7C6D5E4F3A21 }; 
+    uint8_t iv[DES_BLOCK_SIZE] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77 };  
+    uint8_t ciphertext[256];
+    encrypt3DES_CBC(plaintext, length, key, iv, ciphertext);
+    printf("Encrypted Ciphertext: ");
+    print_hex(ciphertext, length);
+    return 0;
+}
