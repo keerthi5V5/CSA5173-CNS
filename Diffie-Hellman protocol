@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <math.h>
+long power_mod(long base, long exp, long mod) {
+    long result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1)
+            result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp /= 2;
+    }
+    return result;
+}
+
+int main() {
+    long q = 23; 
+    long g = 5;  
+    long x = 8; 
+    long A = power_mod(g, x, q); 
+    long y = 12; 
+    long B = power_mod(g, y, q); 
+    long K_Alice = power_mod(B, x, q);
+    long K_Bob = power_mod(A, y, q);   
+    printf("Shared key computed by Alice: %ld\n", K_Alice);
+    printf("Shared key computed by Bob: %ld\n", K_Bob);
+
+    return 0;
+}
