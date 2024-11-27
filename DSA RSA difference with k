@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+#define P 23  
+#define Q 11 
+#define G 2   
+int mod_exp(int base, int exponent, int mod) {
+    int result = 1;
+    base = base % mod;
+    while (exponent > 0) {
+        if (exponent % 2 == 1)
+            result = (result * base) % mod;
+        exponent = exponent >> 1;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+int generate_k(int q) {
+    return rand() % (q - 1) + 1;
+}
+void dsa_sign(int message, int private_key, int *r, int *s) {
+    int k = generate_k(Q);
+    *r = mod_exp(G, k, P) % Q; 
+    *s = ((private_key * *r + k * message) % Q) % Q; 
+}
+int main() {
+    srand(time(NULL)); 
+    int private_key = 7; 
+    int message = 15;     
+    int r1, s1, r2, s2;
+    dsa_sign(message, private_key, &r1, &s1);
+    dsa_sign(message, private_key, &r2, &s2);
+    printf("First signature: (r1, s1) = (%d, %d)\n", r1, s1);
+    printf("Second signature: (r2, s2) = (%d, %d)\n", r2, s2);
+    if (r1 != r2 || s1 != s2) {
+        printf("The signatures differ because the value of k is different each time.\n");
+    } else {
+        printf("The signatures are identical (this would not happen in DSA with proper k).");
+    }
+    
+    return 0;
+}
