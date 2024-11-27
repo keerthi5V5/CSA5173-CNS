@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+void countFrequencies(const char *ciphertext, int freq[256]) {
+    for (int i = 0; i < strlen(ciphertext); i++) {
+        if (isprint(ciphertext[i])) {
+            freq[(unsigned char)ciphertext[i]]++;
+        }
+    }
+}
+void printFrequencies(const int freq[256]) {
+    printf("Character frequencies:\n");
+    for (int i = 0; i < 256; i++) {
+        if (freq[i] > 0 && isprint(i)) {
+            printf("'%c': %d\n", i, freq[i]);
+        }
+    }
+}
+void substitute(const char *ciphertext, char *plaintext, const char key[256]) {
+    for (int i = 0; i < strlen(ciphertext); i++) {
+        if (isprint(ciphertext[i])) {
+            plaintext[i] = key[(unsigned char)ciphertext[i]];
+        } else {
+            plaintext[i] = ciphertext[i]; 
+        }
+    }
+    plaintext[strlen(ciphertext)] = '\0';
+}
+int main() {
+    const char ciphertext[] =
+        "53‡‡†305))6*:4826)41.)41);806*;48+860))85;;]8*::$8+83 "
+        "(88)5*4:46(;88*96?;8)(;485);5+2:(;4956*2(5*4)88\n\n"
+        "4069285);)6+8)4‡‡:1($9:48081;8:811;48485;4)485+528806*81 "
+        "($9;48;(88;4(†234;48)4;161;:188;12;";
+    printf("Ciphertext:\n%s\n", ciphertext);
+    int freq[256] = {0};
+    countFrequencies(ciphertext, freq);
+    printFrequencies(freq);
+    char key[256];
+    for (int i = 0; i < 256; i++) {
+        key[i] = '?';
+    }
+    key['‡'] = 'e';
+    key['*'] = 't';
+    key[':'] = 'h'; 
+    char plaintext[1024];
+    substitute(ciphertext, plaintext, key);
+    printf("\nPartially Decrypted Text:\n%s\n", plaintext);
+    return 0;
+}
